@@ -1,0 +1,1198 @@
+openapi: 3.0.1
+info:
+  title: E-Signature API
+  description: |
+    APIs to access and modify the Envelopes/Documents on Docusign API . The unit for this API integration” service that wraps electronic document management and e-signatures.Document has an ID, and can be Created or Updated,and  deleted from this API.The intent is that a user will request to  a new or existing envelope.User can create ,retrieve,delete document with id.
+  version: 1.0.0
+paths:
+  /envelope:
+    post:
+      tags:
+        - remote signing
+      summary: Send an envelope with a remote (email) signer and cc recipient
+      description: | 
+        The envelope includes a pdf, Word, and HTML document. Anchor text (AutoPlace) is used to position the signing fields in the documents.
+        This is a general example of creating and sending an envelope (a signing request) to multiple recipients, with multiple documents, and with signature fields for the documents.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/remoteSigning-request"         
+      responses:
+        200:
+            description: Successful response.
+            content:
+                application/json:
+                  schema:
+                    $ref: "#/components/schemas/envelope-response"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"        
+        default:
+          $ref: "#/components/responses/default"
+          
+  /envelope/embed:
+    post:
+      tags:
+        - embed signing
+      summary: signing is done within an application
+      description: |
+        Embedded Sending An envelope will be created in draft mode and initiated either remotely, via an email notification that directs signers to view or sign their documents through the DocuSign website, or performed directly within an application using embedded sending and embedded signing.
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: "#/components/schemas/embedSigning-request"                                   
+      responses:
+        200:
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/embed-response"         
+        400:
+           $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        default:
+          $ref: "#/components/responses/default"  
+          
+  /envelope/template:
+    post:
+      tags:
+        - remote signing using template
+      summary: Send an envelope with a remote (email) signer and cc recipient using template
+      description: | 
+        Remote signing using template. Template Id is must for this remote signing. This is a general example of creating and sending an envelope (a signing request) to multiple recipients, with multiple documents, and with signature fields for the documents.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/remoteSigningByTemplate-request"         
+      responses:
+        200:
+            description: Successful response.
+            content:
+                application/json:
+                  schema:
+                    $ref: "#/components/schemas/envelope-response"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"        
+        default:
+          $ref: "#/components/responses/default"
+          
+  /envelope/embed/template:
+    post:
+      tags:
+        - embed signing using template
+      summary: signing is done within an application using template
+      description: |
+        This is been created by using template. Template id is must for this embedded signing. Embedded Sending An envelope will be created in draft mode and initiated either remotely, via an email notification that directs signers to view or sign their documents through the DocuSign website, or performed directly within an application using embedded sending and embedded signing.
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: "#/components/schemas/embedSigningByTemplate-request"                                   
+      responses:
+        200:
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/embed-response"         
+        400:
+           $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        default:
+          $ref: "#/components/responses/default"  
+          
+  /envelope/{days}:
+    parameters:     
+      - name: days
+        in: path
+        required: true
+        description: number of days to get previous envelopes
+        example: 10
+        schema:
+          type: integer 
+    get:
+      tags:
+        - list of envelopes
+      summary: it will return the envelope list
+      description: |
+        Return list of envelope of specified days.
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/listEnvelope-responses"          
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        default:
+          $ref: "#/components/responses/default" 
+          
+  /envelope/{envelopeId}/document/{docId}:
+    parameters:
+      - name: envelopeId
+        in: path
+        required: true
+        description: envelopeId of the envelope being accessed.
+        schema:
+          type: string
+        example: 93be49ab-afa0-4adf-933c-f752070d71ec   
+      - name: docId
+        in: path
+        required: true
+        description: documentId The ID of the document being accessed.
+        schema:
+          type: string
+        example: 1  
+    get:
+      tags:
+        - download document 
+      summary: retrieves the specified document from the specified envelope.
+      description: |
+        Envelope id and document id is required to retrieve documnet. Documnet id is which has specified while creation of envelope.
+      responses:
+        200:
+         description: Successful response
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/document-responses"    
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        404:
+          $ref: "#/components/responses/NotFound" 
+        default:
+          $ref: "#/components/responses/default"              
+    delete:
+      tags:
+        - delete document 
+      summary: Deletes one or more documents from an existing draft envelope
+      description: |
+       Deletes one or more documents from an existing envelope that has not yet been completed.The envelope status must be one of(created /sent/delivered)
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/delete-responses"
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"  
+        404:
+          $ref: "#/components/responses/NotFound"       
+        default:
+          $ref: "#/components/responses/default"
+          
+  /envelope/{envelopeId}/document:
+    parameters:     
+     - name: envelopeId
+       in: path
+       required: true
+       description: The envelope id to fetch all documents from particular envelope
+       example: 93be49ab-afa0-4adf-933c-f752070d71ec
+       schema:
+        type: string    
+    get:
+      tags:
+        - download all documents
+      summary: List the envelope documents of specified envelope id. 
+      description: |
+          Retuens all the documents present in the envelope.A Certificate of Completion document is also associated with every envelope.
+      responses:   
+          200:
+            description: Successful response
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/listDocument-responses"
+          400:
+            $ref: "#/components/responses/BadRequest"
+          401:
+            $ref: "#/components/responses/Unauthorized"        
+          default:
+            $ref: "#/components/responses/default"           
+  /envelope/query:
+    post:
+      tags:
+        - filter envelopes
+      summary: It will return filtered envelopes
+      description: |
+       It will query on envelopes to get filtered envelopes. From date needs to specify, if its not specified then it will query on last 30 days envelopes and returns filtered list. Default value for from date is current date minus 30 days.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/query-request"
+      responses:
+        200:
+          description: Successful response
+          content:
+             application/json:
+               schema:
+                 $ref: "#/components/schemas/listEnvelope-responses" 
+        400:
+          $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        default:
+          $ref: "#/components/responses/default"
+  /envelope/status:
+    post:
+      tags:
+        - webhook Listener
+      summary: It will accept envelope status xml as a string 
+      description: |
+        Docusign will call this endpoint with XML request body. It parse that xml and stores envelope object which contains envelope and recipient status in in-memory database.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/webhook-request"
+      responses:
+        200:
+          description: Successful response does not return anything
+  /envelope/status/{envelopeId}:
+    parameters:     
+     - name: envelopeId
+       in: path
+       required: true
+       description: The envelope id to fetch envelope status
+       example: 93be49ab-afa0-4adf-933c-f752070d71ec
+       schema:
+        type: string
+    get:
+      tags:
+        - polling envelope status
+      summary: envelope and recipient status 
+      description: |
+          Returns envelope object with envelope and recipient status and removes envelope entry from in-memory database once envelope signing completed.
+      responses:   
+          200:
+            description: Successful response
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/webhook-responses"
+          400:
+            $ref: "#/components/responses/BadRequest"
+          401:
+            $ref: "#/components/responses/Unauthorized"  
+          404:
+            $ref: "#/components/responses/NotFound"             
+          default:
+            $ref: "#/components/responses/default" 
+  /template:
+    get:
+      tags:
+        - list of templates
+      summary: List all the templates 
+      description: |
+          Retuens all the templates list
+      responses:   
+          200:
+            description: Successful response
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/template-responses"
+          400:
+            $ref: "#/components/responses/BadRequest"
+          401:
+            $ref: "#/components/responses/Unauthorized"        
+          default:
+            $ref: "#/components/responses/default"
+          
+                       
+components:
+    responses:
+        BadRequest:
+            description: Bad Request
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/errorDetails"
+                    example:
+                        error: Bad Request 
+                        message: Some input provided was wrong (Identify the bad input in the error), please check the value
+                        status: 400
+                        timestamp: 2020-07-06T03:59:49.4870000Z
+                                               
+        default:
+            description: Unexpected error
+            content:
+                application/json:
+                    schema:
+                      additionalProperties: false
+                      $ref: "#/components/schemas/errorDetails"
+                    example:
+                        error: Internal Server Error
+                        message: An Internal Server error occured
+                        status: 500
+                        timestamp: 2020-07-06T03:59:49.4870000Z
+                       
+        NotFound:
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  additionalProperties: false
+                  $ref: "#/components/schemas/errorDetails"
+                example:
+                    error: Not Found  
+                    message: Could not find the specified ID. Please check your input and try again.
+                    status: 404
+                    timestamp: 2020-07-06T03:59:49.4870000Z
+                      
+        Unauthorized:
+            description: User failed to provide a valid key.
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/errorDetails"
+                    example:
+                        error: Unauthorized
+                        message: Authorization for this operation failed
+                        status: 401
+                        timestamp: 2020-07-06T03:59:49.4870000Z                       
+    schemas:
+        remoteSigning-request:
+          type: object
+          properties:  
+                emailSubject:
+                    type: string
+                recipients:
+                    type: object
+                    properties:
+                        signers:
+                            $ref: "#/components/schemas/signer-info"
+                        carbonCopies:
+                            $ref: "#/components/schemas/cc-info"
+                documents:
+                    $ref: "#/components/schemas/documents-info"
+                status:    
+                    type: string
+          example:
+                 emailSubject: "Please sign this document sent from the Java SDK"
+                 recipients: 
+                        signers:
+                          - name: "Swati Jadhav"
+                            email: "Swati.Jadhav@nmgtechnologies.com"
+                            routingOrder: "1"
+                            tabs:
+                              signHereTabs:
+                                    anchorString: "/sn3/"
+                                    anchorUnits: "pixels"
+                                    anchorXOffset: "20"
+                                    anchorYOffset: "10"
+                                    documentId: "1"
+                                    pageNumber: "3"
+                          - name: "Manas Adyatam"
+                            email: "manas@nmgtechnologies.com"
+                            routingOrder: "2"
+                            tabs:
+                              signHereTabs:                             
+                                  anchorString: "/sn3/"
+                                  anchorUnits: "pixels"
+                                  anchorXOffset: "20"
+                                  anchorYOffset: "10"
+                                  documentId: "1"
+                                  pageNumber: "3"
+                        carbonCopies:
+                          - name: "Khem Chand"
+                            email: "Khemchand.Bhardwaj@nmgtechnologies.com"
+                            routingOrder: "3"
+                 documents:
+                        name: "Battle_Plan"
+                        fileExtension: "docx"
+                        documentId: "1"
+                        documentBase64: "JVBERi0xLjUKJfv8/f4KJVdyaXRpbmcgb2JqZWN0cy4uLgo0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9SZXNvdXJjZXMgNSAwIFIKL1BhcmVudCAzIDAgUgovTWVkaWFCb3ggWzAgMCA2MTIgNzkyIF0KL0NvbnRlbnRzIFs2IDAgUiA3IDAgUiA4IDAgUiA5IDAgUiAxMCAwIFIgXQovR3JvdXAgPDwKL1R5cGUgL0dyb3VwCi9TIC9UcmFuc3BhcmVuY3kKL0NTIC9EZXZpY2VSR0IKPj4KL1RhYnMgL1MKL1N0cnVjdFBhcmVudHMgMAo+PgplbmRvYmoKNSAwIG9iago8PAovRm9udCA8PAovRjEgMTEgMCBSCj4+Ci9FeHRHU3RhdGUgPDwKL0dTNyAxMiAwIFIKL0dTOCAxMyAwIFIKPj4KL1Byb2NTZXQgWy9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQovWE9iamVjdCA8PAovWDAgMTQgMCBSCj4+Cj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9Qcm9kdWNlciAoUERGS2l0Lk5FVCAyMC4yLjEuMTI1MDgpCi9DcmVhdGlvbkRhdGUgKEQ6MjAyMDA2MTUwNDExMjYtMDcnMDAnKQovTW9kRGF0ZSAoRDoyMDIwMDYxNTA0MTEyNi0w"
+                 status: "sent"       
+        
+        embedSigning-request:
+            type: object
+            properties:  
+                emailSubject:
+                    type: string
+                recipients:
+                    type: object
+                    properties:
+                        signers:
+                          $ref: "#/components/schemas/signer-info"
+                documents:
+                    $ref: "#/components/schemas/documents-info"
+                status:    
+                    type: string
+                recipientViewRequest:
+                    type: object
+                    properties:
+                       returnUrl:
+                          type: string
+                       authenticationMethod:
+                          type: string
+            example:
+                {
+                  "emailSubject": "Please sign this document sent from the Java SDK",
+                  "recipients": {
+                               "signers": [
+                                            {
+                                                "name": "swati",
+                                                "email": "swati.jadhav@nmgtechnologies.com",
+                                                "routingOrder": "0",
+                                                "tabs": {
+                                                          "signHereTabs":
+                                                            [
+                                                                    {
+                                                                      "anchorString": "/sn1/",
+                                                                      "anchorUnits": "pixels",
+                                                                      "anchorXOffset": "20",
+                                                                      "anchorYOffset": "10",
+                                                                      "documentId": "1",
+                                                                      "pageNumber": "1"
+                                                                    } 
+                                                            ]
+                                                        }
+                                            },
+                                            {
+                                                "name": "kc",
+                                                "email": "Khemchand.Bhardwaj@nmgtechnologies.com",
+                                                "routingOrder": "0",
+                                                "tabs": {
+                                                          "signHereTabs":
+                                                            [
+                                                                    {
+                                                                        "anchorString": "/sn2/",
+                                                                        "anchorUnits": "pixels",
+                                                                        "anchorXOffset": "20",
+                                                                        "anchorYOffset": "10",
+                                                                        "documentId": "1",
+                                                                        "pageNumber": "4"
+                                                                     }
+                                                            ]
+                                                        }   
+                                            },
+                                            {
+                                                "name": "manas",
+                                                "email": "manas@nmgtechnologies.com",
+                                                "routingOrder": "0",
+                                                "tabs":{
+                                                          "signHereTabs":
+                                                            [
+                                                                    {
+                                                                        "anchorString": "/sn3/",
+                                                                        "anchorUnits": "pixels",
+                                                                        "anchorXOffset": "20",
+                                                                        "anchorYOffset": "10",
+                                                                        "documentId": "1",
+                                                                        "pageNumber": "3"
+                                                                    }
+                                                            ]
+                                                        }                                               
+                                            }                                           
+                                          ]
+                                 },
+                  "documents": [
+                                {
+                                    "name": "README",
+                                    "fileExtension": "docx",
+                                    "documentId": "1",
+                                    "documentBase64": "JVBERi0xLjUKJfv8/f4KJVdyaXRpbmcgb2JqZWN0cy4uLgo0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9SZXNvdXJjZXMgNSAwIFIKL1BhcmVudCAzIDAgUgovTWVkaWFCb3ggWzAgMCA2MTIgNzkyIF0KL0NvbnRlbnRzIFs2IDAgUiA3IDAgUiA4IDAgUiA5IDAgUiAxMCAwIFIgXQovR3JvdXAgPDwKL1R5cGUgL0dyb3VwCi9TIC9UcmFuc3BhcmVuY3kKL0NTIC9EZXZpY2VSR0IKPj4KL1RhYnMgL1MKL1N0cnVjdFBhcmVudHMgMAo+PgplbmRvYmoKNSAwIG9iago8PAovRm9udCA8PAovRjEgMTEgMCBSCj4+Ci9FeHRHU3RhdGUgPDwKL0dTNyAxMiAwIFIKL0dTOCAxMyAwIFIKPj4KL1Byb2NTZXQgWy9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQovWE9iamVjdCA8PAovWDAgMTQgMCBSCj4+Cj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9Qcm9kdWNlciAoUERGS2l0Lk5FVCAyMC4yLjEuMTI1MDgpCi9DcmVhdGlvbkRhdGUgKEQ6MjAyMDA2MTUwNDExMjYtMDcnMDAnKQovTW9kRGF0ZSAoRDoyMDIwMDYxNTA0MTEyNi0wNycwMCcpCi9BdXRob3IgKCkKL0NyZWF0b3IgKCkKL0tleXdvcmRzIDw+Ci9TdWJqZWN0ICgpCi9UaXRsZSAoKQo+PgplbmRvYmoKNiAwIG9iago8PAovTGVuZ3RoIDEwCi9GaWx0ZXIgL0ZsYXRlRGVjb2RlCj4+CnN0cmVhbQp4nCvkAgAA7gB8CmVuZHN0cmVhbQplbmRvYmoKNyAwIG9iago8PAovTGVuZ3RoIDQKPj4Kc3RyZWFtCgogcSAKZW5kc3RyZWFtCmVuZG9iago4IDAgb2JqCjw8Ci9GaWx0"
+                                }
+                            ],   
+                  "status": "sent",
+                  "recipientViewRequest": {
+                                        "returnUrl": "http://localhost:8080/done",
+                                        "authenticationMethod": "None"
+                                       }
+              }            
+               
+        remoteSigningByTemplate-request:
+          type: object
+          properties:  
+                emailSubject:
+                    type: string
+                recipients:
+                    type: object
+                    properties:
+                        signers:
+                            $ref: "#/components/schemas/templateSigner-info"
+                        carbonCopies:
+                            $ref: "#/components/schemas/cc-info"
+                status:    
+                    type: string
+                templateId:
+                    type: string
+          example:
+                 emailSubject: "Please sign this document sent from the Java SDK"
+                 recipients: 
+                        signers:
+                          - name: "Swati Jadhav"
+                            email: "Swati.Jadhav@nmgtechnologies.com"
+                            routingOrder: "1"
+                          - name: "Manas Adyatam"
+                            email: "manas@nmgtechnologies.com"
+                            routingOrder: "2"
+                        carbonCopies:
+                          - name: "Khem Chand"
+                            email: "Khemchand.Bhardwaj@nmgtechnologies.com"
+                            routingOrder: "3"        
+                 status: "sent"
+                 templateId: "4c8e0a3c-748b-4ce6-9206-db855c8eb6fd"
+                 
+        embedSigningByTemplate-request:
+            type: object
+            properties:  
+                emailSubject:
+                    type: string
+                recipients:
+                    type: object
+                    properties:
+                        signers:
+                          $ref: "#/components/schemas/templateSigner-info"
+                status:    
+                    type: string
+                templateId:
+                    type: string   
+                recipientViewRequest:
+                    type: object
+                    properties:
+                       returnUrl:
+                          type: string
+                       authenticationMethod:
+                          type: string
+            example:
+                {
+                  "emailSubject": "Please sign this document sent from the Java SDK",
+                  "recipients": {
+                               "signers": [
+                                            {
+                                                "name": "swati",
+                                                "email": "swati.jadhav@nmgtechnologies.com",
+                                                "routingOrder": "0" 
+                                            },
+                                            {
+                                                "name": "kc",
+                                                "email": "Khemchand.Bhardwaj@nmgtechnologies.com",
+                                                "routingOrder": "0",       
+                                            },
+                                            {
+                                                "name": "manas",
+                                                "email": "manas@nmgtechnologies.com",
+                                                "routingOrder": "0",                                                  
+                                            }                                           
+                                          ]
+                                 },   
+                  "status": "sent",
+                  "templateId": "4c8e0a3c-748b-4ce6-9206-db855c8eb6fd",
+                  "recipientViewRequest": {
+                                        "returnUrl": "http://localhost:8080/done",
+                                        "authenticationMethod": "None"
+                                       }
+              }
+        query-request:
+                    type: object
+                    properties:
+                       count:
+                         type: string
+                       email:
+                         type: string
+                       envelopeIds:
+                         type: string
+                       fromDate:
+                         type: string
+                       order:
+                         type: string
+                       orderBy:
+                         type: string
+                       toDate:
+                         type: string
+                    example:     
+                        {
+                          "count": "2",
+                          "email": "abc@nmgtechnologies.com",
+                          "envelopeIds": "",
+                          "fromDate": "2020-04-02",
+                          "fromToStatus": "",
+                          "order": "desc",
+                          "orderBy": "created",
+                          "status": "",
+                          "toDate": ""
+                        }              
+        envelope-response:        
+            type: object
+            properties:
+                envelopeId:
+                    type: string
+                status:
+                    type: string
+                statusDateTime:    
+                    type: string
+                uri:    
+                    type: string
+            example:
+                {
+                  "envelopeId": "588f14a6-c70e-4443-babd-37a0dbcc3002",
+                  "status": "sent",
+                  "statusDateTime": "2020-06-23T06:55:42.2160863Z",
+                  "uri": "/envelopes/588f14a6-c70e-4443-babd-37a0dbcc3002"
+                }        
+        embed-response:  
+            type: object
+            properties: 
+                envelopeId:
+                    type: string
+                embeds:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            signerName:
+                                type: string
+                            viewUrl:
+                                type: string
+            example:
+                    {
+                        "envelopeId": "588f14a6-c70e-4443-babd-37a0dbcc3002",            
+                        "embeds":   [
+                                        {
+                                            "signerName": "swati",
+                                            "viewUrl": "https://demo.docusign.net/Signing/MTRedeem/v1/0679dbcf-ecbf-4a8e-b458-f6311b9fc58b?slt=eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiNjgxODVmZjEtNGU1MS00Y2U5LWFmMWMtNjg5ODEyMjAzMzE3In0.AQUAAAABAAMABwAAYyYnQxfYSAgAAMH22UMX2EgYAAEAAAAAAAAAIQBdAwAAeyJUb2tlbklkIjoiYzMyZjkwZDAtOGYyMy00MzZhLWFlNTctN2Q1MDgxZGRkZjAxIiwiU3ViamVjdCI6bnVsbCwiU3ViamVjdFR5cGUiOm51bGwsIkV4cGlyYXRpb24iOiIyMDIwLTA2LTIzVDA3OjA1OjQ2KzAwOjAwIiwiSXNzdWVkQXQiOiIyMDIwLTA2LTIzVDA3OjAwOjQ2LjE3MjY2NzUrMDA6MDAiLCJSZXNvdXJjZUlkIjoiYzk1OTYxOWMtOWU2NS00YWZmLWI1OWMtNjgzYWE5OTQ0OGYxIiwiTGFiZWwiOm51bGwsIlNpdGVJZCI6bnVsbCwiUmVzb3VyY2VzIjoie1wiRW52ZWxvcGVJZFwiOlwiYzk1OTYxOWMtOWU2NS00YWZmLWI1OWMtNjgzYWE5OTQ0OGYxXCIsXCJBY3RvclVzZXJJZFwiOlwiOTZkN2IwMWItODg3Ny00NzllLWI1ZjktZTcwNTgxOTAyZmE1XCIsXCJSZWNpcGllbnRJZFwiOlwiOGZjMDdlZTYtNWVkNS00YmJjLTg3ODktY2QwZDFiMjBjMzZhXCIsXCJGYWtlUXVlcnlTdHJpbmdcIjpcInQ9ZWY0YjhlMzItZWNmNC00YjBhLTg2OTEtMmEyNzgwMDI0ZmUwXCJ9IiwiT0F1dGhTdGF0ZSI6bnVsbCwiVG9rZW5UeXBlIjoxLCJBdWRpZW5jZSI6IjI1ZTA5Mzk4LTAzNDQtNDkwYy04ZTUzLTNhYjJjYTU2MjdiZiIsIlNjb3BlcyI6bnVsbCwiUmVkaXJlY3RVcmkiOiJodHRwczovL2RlbW8uZG9jdXNpZ24ubmV0L1NpZ25pbmcvU3RhcnRJblNlc3Npb24uYXNweCIsIkhhc2hBbGdvcml0aG0iOjAsIkhhc2hTYWx0IjpudWxsLCJIYXNoUm91bmRzIjowLCJUb2tlblNlY3JldEhhc2giOm51bGwsIlRva2VuU3RhdHVzIjowLCJFeHRlcm5hbENsYWltc1JlcXVlc3RlZCI6bnVsbCwiVHJhbnNhY3Rpb25JZCI6bnVsbCwiVHJhbnNhY3Rpb25FdmVudENhbGxiYWNrVXJsIjpudWxsLCJJc1NpbmdsZVVzZSI6ZmFsc2V9.aCQCfUD6insRc8-RnFUhTopCuxr0e4sAp93pM1RsDtQDQK4Wv7BGrxz-Vqkb2rF_9tKoGfizgI-mlIDIefCtIlFK01Y7XrUAleACoM8uZHMdyZr7OZlycORPCvIFLlqLxfcQDN3cBH4SAdGe0Z6N0LnYLWqvvfTXv-Gf7ulCgZ1SqouL8L7hfRFIHRrpWwGW18rk_kpwc96dXO9q_QvPy060556j6fxSMN0Xee_yg9FUsJ3XtoJacl_roj_FykoFrFNWvs7juDcjPBMAZTwgzRRniNXdyxf3LDHvnW0srmFxAPGHRvpbL08mnLq7tbkv6ZXuL4PNqq8ei5olL7yjRQ"
+                                        },
+                                        {
+                                            "signerName": "khem",
+                                            "viewUrl": "https://demo.docusign.net/Signing/MTRedeem/v1/0679dbcf-ecbf-4a8e-b458-f6311b9fc58b?slt=eyJ0eXAiOiJNVCIsImFsZyI6IlJTMjU2Iiwia2lkIjoiNjgxODVmZjEtNGU1MS00Y2U5LWFmMWMtNjg5ODEyMjAzMzE3In0.AQUAAAABAAMABwAAYyYnQxfYSAgAAMH22UMX2EgYAAEAAAAAAAAAIQBdAwAAeyJUb2tlbklkIjoiYzMyZjkwZDAtOGYyMy00MzZhLWFlNTctN2Q1MDgxZGRkZjAxIiwiU3ViamVjdCI6bnVsbCwiU3ViamVjdFR5cGUiOm51bGwsIkV4cGlyYXRpb24iOiIyMDIwLTA2LTIzVDA3OjA1OjQ2KzAwOjAwIiwiSXNzdWVkQXQiOiIyMDIwLTA2LTIzVDA3OjAwOjQ2LjE3MjY2NzUrMDA6MDAiLCJSZXNvdXJjZUlkIjoiYzk1OTYxOWMtOWU2NS00YWZmLWI1OWMtNjgzYWE5OTQ0OGYxIiwiTGFiZWwiOm51bGwsIlNpdGVJZCI6bnVsbCwiUmVzb3VyY2VzIjoie1wiRW52ZWxvcGVJZFwiOlwiYzk1OTYxOWMtOWU2NS00YWZmLWI1OWMtNjgzYWE5OTQ0OGYxXCIsXCJBY3RvclVzZXJJZFwiOlwiOTZkN2IwMWItODg3Ny00NzllLWI1ZjktZTcwNTgxOTAyZmE1XCIsXCJSZWNpcGllbnRJZFwiOlwiOGZjMDdlZTYtNWVkNS00YmJjLTg3ODktY2QwZDFiMjBjMzZhXCIsXCJGYWtlUXVlcnlTdHJpbmdcIjpcInQ9ZWY0YjhlMzItZWNmNC00YjBhLTg2OTEtMmEyNzgwMDI0ZmUwXCJ9IiwiT0F1dGhTdGF0ZSI6bnVsbCwiVG9rZW5UeXBlIjoxLCJBdWRpZW5jZSI6IjI1ZTA5Mzk4LTAzNDQtNDkwYy04ZTUzLTNhYjJjYTU2MjdiZiIsIlNjb3BlcyI6bnVsbCwiUmVkaXJlY3RVcmkiOiJodHRwczovL2RlbW8uZG9jdXNpZ24ubmV0L1NpZ25pbmcvU3RhcnRJblNlc3Npb24uYXNweCIsIkhhc2hBbGdvcml0aG0iOjAsIkhhc2hTYWx0IjpudWxsLCJIYXNoUm91bmRzIjowLCJUb2tlblNlY3JldEhhc2giOm51bGwsIlRva2VuU3RhdHVzIjowLCJFeHRlcm5hbENsYWltc1JlcXVlc3RlZCI6bnVsbCwiVHJhbnNhY3Rpb25JZCI6bnVsbCwiVHJhbnNhY3Rpb25FdmVudENhbGxiYWNrVXJsIjpudWxsLCJJc1NpbmdsZVVzZSI6ZmFsc2V9.aCQCfUD6insRc8-RnFUhTopCuxr0e4sAp93pM1RsDtQDQK4Wv7BGrxz-Vqkb2rF_9tKoGfizgI-mlIDIefCtIlFK01Y7XrUAleACoM8uZHMdyZr7OZlycORPCvIFLlqLxfcQDN3cBH4SAdGe0Z6N0LnYLWqvvfTXv-Gf7ulCgZ1SqouL8L7hfRFIHRrpWwGW18rk_kpwc96dXO9q_QvPy060556j6fxSMN0Xee_yg9FUsJ3XtoJacl_roj_FykoFrFNWvs7juDcjPBMAZTwgzRRniNXdyxf3LDHvnW0srmFxAPGHRvpbL08mnLq7tbkv6ZXuL4PNqq8ei5olL7yjRQ"
+                                    }]
+                    }
+                
+        listEnvelope-responses:
+            type: object
+            properties:
+                envelopes:
+                   type: array
+                   items:               
+                      type: object
+                      properties:
+                         createdDateTime:
+                            type: string 
+                         emailSubject:
+                            type: string      
+                         documents:    
+                            type: array
+                            items:
+                               type: object
+                               properties:
+                                  documentId:
+                                    type: string
+                                  name:
+                                    type: string
+                                  type:
+                                    type: string
+                         envelopeId:
+                            type: string 
+                         lastModifiedDateTime:
+                            type: string
+                         recipients:
+                            type: object
+                            properties:
+                                carbonCopies:
+                                    $ref: "#/components/schemas/recipient-info"
+                                signers:            
+                                    $ref: "#/components/schemas/recipient-info"
+                         sentDateTime:
+                            type: string 
+                         status:
+                            type: string 
+                         statusChangedDateTime:
+                            type: string
+            example:
+                    {
+                     "envelopes":[
+                              {
+                                "createdDateTime": "2020-06-16T05:02:17.3770000Z",
+                                "emailSubject": "Please sign this document sent from the Java SDK",
+                                "envelopeDocuments": [
+                                            {
+                                              "documentId": "1",
+                                              "name": "README",
+                                              "type": "content"
+                                            },
+                                            {
+
+                                              "documentId": "certificate",
+                                              "name": "Summary",
+                                              "type": "summary"
+                                            }
+                                          ],
+                                "envelopeId": "cb5c1ebc-3744-4de6-9ff2-06c433588654",
+                                "lastModifiedDateTime": "2020-06-17T13:20:00.0030000Z",
+                                "recipients": {
+                                              
+                                                "carbonCopies": [
+                                                          {
+                                                          "deliveredDateTime": null,
+                                                          "deliveryMethod": "email",
+                                                          "email": "Khemchand.Bhardwaj@nmgtechnologies.com",
+                                                          "name": "Khem Chand",
+                                                          "recipientId": "3",
+                                                          "routingOrder": "3",
+                                                          "status": "created",
+                                                          }
+                                                        ],
+                                                "signers": [
+                                                      {
+                                                        "deliveredDateTime": null,
+                                                        "deliveryMethod": "email",
+                                                        "email": "Swati.Jadhav@nmgtechnologies.com",
+                                                        "name": "Swati Jadhav",
+                                                        "recipientId": "1",
+                                                        "routingOrder": "1",
+                                                        "signedDateTime": "2020-07-10T05:10:38.7870000Z",
+                                                        "status": "sent",
+                                                      }
+                                                    ]
+                                        },
+                                "sentDateTime": "2020-06-16T05:02:19.0800000Z",
+                                "status": "sent",
+                                "statusChangedDateTime": "2020-06-17T13:20:00.0170000Z" 
+                              },
+                              {
+                                "createdDateTime": "2020-06-23T07:00:43.5270000Z",
+                                "emailSubject": "Please sign this document sent from the Java SDK",
+                                "envelopeDocuments": [
+                                            {
+                                              "documentId": "1",
+                                              "name": "lorem",
+                                              "type": "content",
+                                            },
+                                            {
+
+                                                "documentId": "certificate",
+                                                "name": "Summary",
+                                                "type": "summary"
+                                            }
+                                          ],
+                                "envelopeId": "c959619c-9e65-4aff-b59c-683aa99448f1",
+                                "lastModifiedDateTime": "2020-06-23T07:00:43.5270000Z",
+                                "recipients": {
+                                        "signers": [
+                                                {
+                                                "deliveredDateTime": null,
+                                                "deliveryMethod": "email",
+                                                "email": "Khemchand.Bhardwaj@nmgtechnologies.com",
+                                                "name": "khem",
+                                                "recipientId": "1",
+                                                "routingOrder": "1",
+                                                "status": "sent",
+                                              }
+                                              ]
+                                        },
+                                "sentDateTime": "2020-06-23T07:00:44.8870000Z",
+                                "status": "sent",
+                                "statusChangedDateTime": "2020-06-23T07:00:44.8870000Z"
+                              }]
+                    }        
+        listDocument-responses:
+            type: array
+            items:
+                  $ref: "#/components/schemas/document-responses" 
+                        
+        document-responses:
+            type: object
+            properties:
+                documnetName:
+                    type: string
+                documnetType:
+                    type: string
+                documentBase64:
+                    type: string
+            example:
+                {
+                  "documnetName": "Battle_Plan",
+                  "documnetType": "content",
+                  "documentBase64": "JVBERi0xLjUKJfv8/f4KJVdyaXRpbmcgb2JqZWN0cy4uLgo0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9SZXNvdXJjZXMgOSAwIFIKL1BhcmVudCAzIDAgUgovTWVkaWFCb3ggWzAgMCA2MTIgNzkyIF0KL0NvbnRlbnRzIFs4IDAgUiAxMSAwIFIgMTIgMCBSIDEzIDAgUiAxNCAwIFIgMTUgMCBSIDE2IDAgUiAxNyAwIFIgMTAgMCBSIF0KL0dyb3VwIDw8Ci9UeXBlIC9Hcm91cAovUyAvVHJhbnNwYXJlbmN5Ci9DUyAvRGV2aWNlUkdCCj4+Ci9UYWJzIC9TCi9TdHJ1Y3RQYXJlbnRzIDAKL0Fubm90cyBbXQo+PgplbmRvYmoKNSAwIG9iago8PAovVHlwZSAvUGFnZQovUmVzb3VyY2VzIDE5IDAgUgovUGFyZW50IDMgMCBSCi9NZWRpYUJveCBbMCAwIDYxMiA3OTIgXQovQ29udGVudHMgWzE4IDAgUiAyMSAwIFIgMjIgMCBSIDIzIDAgUiAyNCAwIFIgMjUgMCBSIDIwIDAgUiBdCi9Hcm91cCA8PAovVHlwZSAvR3JvdXAKL1MgL1RyYW5zcGFyZW5jeQovQ1MgL0RldmljZVJHQgo+PgovVGFicyAvUwovU3RydWN0UGFyZW50cyAxCj4"
+                }
+        delete-responses:
+            type: object
+            properties:
+                documentId:
+                    type: string
+                envelopeId:
+                    type: string   
+                message:
+                    type: string
+                name: 
+                    type: string
+            example:
+                {
+                  "documentId": "1",
+                  "envelopeId": "c959619c-9e65-4aff-b59c-683aa99448f1",
+                  "message": "Document deleted successfully",
+                  "name": "lorem",
+                  
+                }
+        template-responses:
+            type: array
+            items:
+                type: object
+                properties:
+                   templateId:
+                      type: string
+                   name:
+                      type: string
+                   documents:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                            documentId:
+                              type: string
+                            name:
+                              type: string
+                   recipients:
+                      type: object
+                      properties:
+                        carbonCopies:
+                            $ref: "#/components/schemas/recipient-info"
+                        signers:
+                            $ref: "#/components/schemas/recipient-info" 
+            example: [
+                      {
+                          "templateId": "a4318539-996b-4b0c-94d3-2b2226494dfa",
+                          "name": "",
+                          "documents": [],
+                          "recipients": {
+                              "signers": null,
+                              "carbonCopy": null
+                          }
+                      },
+                      {
+                          "templateId": "840379c5-5b83-4dfc-b6a4-781876f505ab",
+                          "name": "Example Signer and CC template",
+                          "documents": [
+                              {
+                                  "documentId": "1",
+                                  "name": "Lorem Ipsum",
+                                  "type": null
+                              }
+                          ],
+                          "recipients": {
+                              "signers": [
+                                  {
+                                      "deliveredDateTime": null,
+                                      "deliveryMethod": null,
+                                      "email": "",
+                                      "name": "",
+                                      "recipientId": "1",
+                                      "routingOrder": null,
+                                      "status": null
+                                  }
+                              ],
+                              "carbonCopy": [
+                                  {
+                                      "deliveredDateTime": null,
+                                      "deliveryMethod": null,
+                                      "email": "",
+                                      "name": "",
+                                      "recipientId": "2",
+                                      "routingOrder": null,
+                                      "status": null
+                                  }
+                              ]
+                          }
+                      }]
+        webhook-responses:
+            type: object
+            properties:
+                envelopeId:
+                    type: string
+                emailSubject:
+                    type: string
+                status:
+                    type: string
+                statusChangedDateTime:
+                    type: string
+                recipients:
+                    type: object
+                    properties:
+                            signers:
+                                type: array 
+                                items:
+                                    type: object
+                                    properties:
+                                        deliveredDateTime:
+                                            type: string
+                                        email:
+                                            type: string
+                                        name:
+                                            type: string
+                                        status:
+                                            type: string
+                            carbonCopy:
+                                type: array 
+                                items:
+                                    type: object
+                                    properties:
+                                        deliveredDateTime:
+                                            type: string
+                                        email:
+                                            type: string
+                                        name:
+                                            type: string
+                                        status:
+                                            type: string
+                            
+            example:
+                {
+                    "envelopeId": "3184ec77-80a1-4943-93ed-39b2285f3404",
+                    "emailSubject": "Please sign document sent from java SDK",
+                    "statusChangedDateTime":"2020-08-04T03:24:08.0061467",
+                    "status":"Sent",
+                    "recipients":{
+                    "signers":[
+                        {
+                            "deliveredDateTime":"2020-08-04T03:24:07.943",
+                            "email":"swati.jadhav@nmgtechnologies.com",
+                            "name":"swati jadhav",
+                            "status": "Sent"
+                        },
+                        {
+                            "deliveredDateTime":"2020-08-04T03:24:07.943",
+                            "email":"khemchand.bhardwaj@nmgtechnologies.com",
+                            "name":"khem",
+                            "status": "Created"
+                        },
+                        ],
+                    
+                    "carbonCopy":[
+                        {
+                            "deliveredDateTime":"2020-08-04T03:24:07.943",
+                            "email":"manas@nmgtechnologies.com",
+                            "name":"manas",
+                            "status": "Created"
+                        }
+                    ]
+                    }
+	            } 
+        webhook-request:
+            type: object
+            properties:
+                xmlString:
+                    type: string
+            example: 
+                {
+                  "xmlString": "<?xml version='1.0' encoding='utf-8'?>
+                                  <DocuSignEnvelopeInformation
+                              xmlns:xsd='http://www.w3.org/2001/XMLSchema'
+                                          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+                                          xmlns='http://www.docusign.net/API/3.0'>
+                                          <EnvelopeStatus>
+                                              <RecipientStatuses>
+                                                  <RecipientStatus>
+                                                      <Type>Signer</Type>
+                                                      <Email>khemchand.bhardwaj@nmgtechnologies.com</Email>
+                                                      <UserName>kc bhardwaj</UserName>
+                                                      <RoutingOrder>1</RoutingOrder>
+                                    <Sent>2020-08-05T04:18:26.27</Sent>
+                                    <DeclineReason xsi:nil='true' />
+                                    <Status>Sent</Status>
+                                    <RecipientIPAddress />
+                                    <ClientUserId>98077</ClientUserId>
+                                    <CustomFields />
+                                    <TabStatuses>
+                                      <TabStatus>
+                                                              <TabType>SignHere</TabType>
+                                                              <Status>Active</Status>
+                                                              <XPosition>427</XPosition>
+                                                              <YPosition>321</YPosition>
+                                                              <TabLabel>Sign Here</TabLabel>
+                                                              <TabName>SignHere</TabName>
+                                                              <TabValue />
+                                                              <DocumentID>1</DocumentID>
+                                                              <PageNumber>1</PageNumber>
+                                                          </TabStatus>
+                                                      </TabStatuses>
+                                                      <AccountStatus>Active</AccountStatus>
+                                                      <RecipientId>ce850f33-f020-45cb-9c3f-645ecd47019f</RecipientId>
+                                                  </RecipientStatus>
+                                              </RecipientStatuses>
+                                              <TimeGenerated>2020-08-05T04:18:26.3184784</TimeGenerated>
+                                              <EnvelopeID>15972d4f-3623-4ce8-af30-36d929bb5605</EnvelopeID>
+                                              <Subject>an envelope with a remote</Subject>
+                                              <UserName>swati jadhav</UserName>
+                                              <Email>swati.jadhav@nmgtechnologies.com</Email>
+                                              <Status>Created</Status>
+                                              <Created>2020-08-05T04:18:25.427</Created>
+                                              <ACStatus>Original</ACStatus>
+                                              <ACStatusDate>2020-08-05T04:18:25.427</ACStatusDate>
+                                              <ACHolder>swati jadhav</ACHolder>
+                                              <ACHolderEmail>swati.jadhav@nmgtechnologies.com</ACHolderEmail>
+                                              <ACHolderLocation>DocuSign</ACHolderLocation>
+                                              <SigningLocation>Online</SigningLocation>
+                                              <SenderIPAddress>54.162.118.254 </SenderIPAddress>
+                                              <EnvelopePDFHash />
+                                              <CustomFields>
+                                                  <CustomField>
+                                                      <Name>AccountId</Name>
+                                                      <Show>false</Show>
+                                                      <Required>false</Required>
+                                                      <Value>10418877</Value>
+                                                      <CustomFieldType>Text</CustomFieldType>
+                                                  </CustomField>
+                                                  <CustomField>
+                                                      <Name>AccountName</Name>
+                                                      <Show>false</Show>
+                                                      <Required>false</Required>
+                                                      <Value>NMG</Value>
+                                                      <CustomFieldType>Text</CustomFieldType>
+                                                  </CustomField>
+                                                  <CustomField>
+                                                      <Name>AccountSite</Name>
+                                                      <Show>false</Show>
+                                                      <Required>false</Required>
+                                                      <Value>demo</Value>
+                                                      <CustomFieldType>Text</CustomFieldType>
+                                                  </CustomField>
+                                              </CustomFields>
+                                              <AutoNavigation>true</AutoNavigation>
+                                              <EnvelopeIdStamping>true</EnvelopeIdStamping>
+                                              <AuthoritativeCopy>false</AuthoritativeCopy>
+                                              <DocumentStatuses>
+                                                  <DocumentStatus>
+                                                      <ID>1</ID>
+                                                      <Name>Lorem_Ipsum</Name>
+                                                      <TemplateName />
+                                                      <Sequence>1</Sequence>
+                                                  </DocumentStatus>
+                                              </DocumentStatuses>
+                                          </EnvelopeStatus>
+                                          <DocumentPDFs>
+                                              <DocumentPDF>
+                                                  <Name>Lorem_Ipsum</Name>
+                                                  <PDFBytes>JVBERi0xLjQKJfv8/f4KJVdyaXRpbmcgb2JqZWN0cy4uLgo0IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9QYXJlbnQgMyAwIFIKL1Jlc291cmNlcyA3IDAgUgovQ29udGVudHMgWzYgMCBSIDkgMCBSIDEwIDAgUiAxMSAwIFIgMTIgMCBSIDEzIDAgUiA4IDAgUiBdCi9NZWRpYUJveCBbMCAwIDYxMiA3OTIgXQo+PgplbmRvYmoKOCAwIG9iago8PAovTGVuZ3RoIDE3Cj4+CnN0cmVhbQoKIFEgIHEgL1gzIERvCiBRIAplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwKL0xlbmd0aCA0Cj4+CnN0cmVhbQoKIHEgCmVuZHN0cmVhbQplbmRvYmoKNyAwIG9iago8PAovUHJvY1NldCBbL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCi9Db2xvclNwYWNlIDw8Ci9DczEgMTQgMCBSCj4+Ci9Gb250IDw8Ci9UVDUgMTUgMCBSCi9UVDMgMTYgMCBSCi9UVDEgMTcgMCBSCi9UVDYgMTggMCBSCj4+Ci9YT2JqZWN0IDw8Ci9JbTEgMTkgMCBSCi9YMSAyMCAwIFIKL1gyIDIxIDAgUgovWDMgMjIgMCBSCj4+Cj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9Qcm9kdWNlciAoUERGS2l0Lk5FVCAyMC4yLjIwMC4xMzg4MikKL0NyZWF0aW9uRGF0ZSAoRDoyMDIwMDYxMjA1NDQwMi0wNycwMCcpCi9Nb2REYXRlIChEOjIwMjAwODA1MDQxODI2LTA3JzAwJykKL0F1dGhvciAoKQovQ3JlYXRvciAoV29yZCkKL0tleXdvcmRzIDw+Ci9TdWJqZWN0ICgpCi9UaXRsZSAoTWljcm9zb2Z0IFdvcmQgLSBXb3JsZF9XaWRlX0NvcnBfbG9yZW0uZG9jeCkKPj4KZW5kb2JqCjkgMCBvYmoKPDwKL0xlbmd0aCA0Cj4+CnN0cmVhbQoKIHEgCmVuZHN0cmVhbQplbmRvYmoKMTAgMCBvYmoKPDwKL0xlbmd0aCA0Cj4+CnN0cmVhbQoKIHEgCmVuZHN0cmVhbQplbmRvYmoKMTEgMCBvYmoKPDwKL0xlbmd0aCAzNTU3Ci9GaWx0ZXIgL0ZsYXRlRGVjb2RlCj4+CnN0cmVhbQp4AaWbWZPkRhHH3/UpisOgAYzU2NDMzNjQzMTJkMzU2MTYyMzAyZDM0NjM2NDMyMmQ2MTYzMzY2MzJkMzkzNTYxMzEzNTY2Mzk2NDM4NjE2NTYxPjw3YTEyNTk3ZWYwNTQzZTNkNzEwYjZlMTY0MTI0YjU5NT5dL1ByZXYgMjQ4Mzk2Pj4KJTczNTZmLTRlZDZhLWQyNDRiLTE4ZjMwLTUuNS4xMy1TTkFQU0hPVApzdGFydHhyZWYKMjcwOTQwCiUlRU9GCg==</PDFBytes>
+                                                  <DocumentType>SUMMARY</DocumentType>
+                                              </DocumentPDF>
+                                          </DocumentPDFs>
+                                          <TimeZone>Pacific Standard Time</TimeZone>
+                                          <TimeZoneOffset>-7</TimeZoneOffset>
+                                      </DocuSignEnvelopeInformation> "
+                        
+                      }
+                              
+                
+        signer-info:              
+           type: array 
+           items:
+              type: object
+              properties:
+                name:
+                    type: string
+                email:
+                    type: string
+                routingOrder:
+                    type: string
+                tabs:
+                  $ref: "#/components/schemas/signer-tabs" 
+        cc-info:
+           type: array 
+           items:
+              type: object
+              properties:
+                name:
+                    type: string
+                email:
+                    type: string
+                routingOrder:
+                    type: string 
+        documents-info:
+            type: array
+            items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  fileExtension:
+                    type: string
+                  documentId:
+                    type: string
+                  documentBase64:
+                    type: string          
+        recipient-info:       
+            type: array
+            items:
+               type: object
+               properties:
+                  deliveredDateTime:
+                    type: string
+                  deliveryMethod:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+                  recipientId:
+                    type: string
+                  routingOrder:
+                    type: string
+                  signedDateTime:
+                     type: string
+                  status:
+                    type: string 
+        templateSigner-info:              
+           type: array 
+           items:
+              type: object
+              properties:
+                name:
+                    type: string
+                email:
+                    type: string
+                routingOrder:
+                    type: string
+                
+        signer-tabs:        
+            type: object        
+            properties:
+                  signHereTabs:
+                       type: array
+                       items:
+                             type: object
+                             properties:
+                                anchorString:
+                                  type: string
+                                anchorUnits:
+                                  type: string
+                                anchorXOffset:
+                                  type: string
+                                anchorYOffset:
+                                  type: string
+                                documentId:
+                                  type: string
+                                pageNumber:
+                                  type: string                     
+        errorDetails:
+            type: object
+            properties:
+                error:
+                   type: string
+                message:
+                   type: string
+                status:
+                   type: integer
+                   format: int32
+                timestamp:
+                   type: string
+                   format: date-time
